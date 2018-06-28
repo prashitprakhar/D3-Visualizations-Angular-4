@@ -1,6 +1,13 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 
 import * as d3 from 'd3';
+import * as d3Scale from 'd3-scale';
+import * as d3ScaleChromatic from 'd3-scale-chromatic';
+import * as d3Shape from 'd3-shape';
+import * as d3Array from 'd3-array';
+import * as d3Axis from 'd3-axis';
+
+import { TEMPERATURES } from '../../shared';
 
 @Component({
   selector: '[app-circle-y]',
@@ -11,6 +18,26 @@ import * as d3 from 'd3';
 export class CircleYComponent implements OnInit {
 
   private chartY: any;
+  // data: any;
+
+  // svg: any;
+  // //margin = {top: 20, right: 80, bottom: 30, left: 50};
+  // margin = {top: 10, right: 40, bottom: 30, left: 50};
+  // g: any;
+  // width: number;
+  // height: number;
+  // x;
+  // y;
+  // z;
+  // line;
+  // public minPoint;
+  // public maxPoint;
+  // public minMaxPointsArray: any[] = [];
+  // public pointsXValuesHolder: any[] = [];
+  // public pointsYValuesHolder: any[] = [];
+  // public allPointsArray: any[] = [];
+  // public fullCoordsMin: any[] = [];
+  // public fullCoordsMax: any[] = [];
 
   constructor() { }
 

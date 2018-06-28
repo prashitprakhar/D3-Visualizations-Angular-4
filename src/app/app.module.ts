@@ -9,6 +9,7 @@ import { MultiLineChartsComponent } from './components/multi-line-charts/multi-l
 import { CirclePointLineComponent } from './components/circle-point-line/circle-point-line.component';
 import { CircleXComponent } from './components/circle-x/circle-x.component';
 import { CircleYComponent } from './components/circle-y/circle-y.component';
+import { MultilineScatterplotComponent } from './components/multiline-scatterplot/multiline-scatterplot.component';
 
 
 @NgModule({
@@ -19,7 +20,8 @@ import { CircleYComponent } from './components/circle-y/circle-y.component';
     MultiLineChartsComponent,
     CirclePointLineComponent,
     CircleXComponent,
-    CircleYComponent
+    CircleYComponent,
+    MultilineScatterplotComponent
   ],
   imports: [
     BrowserModule

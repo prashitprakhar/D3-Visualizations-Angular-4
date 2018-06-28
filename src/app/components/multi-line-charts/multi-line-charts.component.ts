@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import * as d3 from 'd3-selection';
+import * as d3 from 'd3';
 import * as d3Scale from 'd3-scale';
 import * as d3ScaleChromatic from 'd3-scale-chromatic';
 import * as d3Shape from 'd3-shape';
@@ -28,7 +28,7 @@ export class MultiLineChartsComponent implements OnInit {
   x;
   y;
   z;
-  line;
+  public line;
   public minPoint;
   public maxPoint;
   public minMaxPointsArray: any[] = [];
@@ -43,10 +43,14 @@ export class MultiLineChartsComponent implements OnInit {
   ngOnInit() {
     //this.data = TEMPERATURES.map((v) => v.values.map((v) => v.date ))[0];
         //.reduce((a, b) => a.concat(b), []);
-        this.data = TEMPERATURES.map((v) => v.values.map((v) => v.x-10))[0]
+        this.data = TEMPERATURES.map((v) => v.values.map((v) => v.x-10))[0];
+
+    //     let maxValue = Math.max.apply(Math, dumArray.map(function (item) { return item.y; }));
+    // let minValue = Math.min.apply(Math, dumArray.map(function (item) { return item.y; }));
         this.initChart();
         this.drawAxis();
         this.drawPath();
+        this.drawHighLow();
   }
 
   private initChart(): void {
@@ -57,13 +61,19 @@ export class MultiLineChartsComponent implements OnInit {
 
     this.g = this.svg.append('g').attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
 
-    this.x = d3Scale.scaleLinear().range([0, this.width]);
-    this.y = d3Scale.scaleLinear().range([this.height, 0]);
-    this.z = d3Scale.scaleOrdinal(d3ScaleChromatic.schemeCategory10);
+    this.x = d3.scaleLinear().range([0, this.width]);
+    this.y = d3.scaleLinear().range([this.height, 0]);
+    this.z = d3.scaleOrdinal(d3ScaleChromatic.schemeCategory10);
 
-    this.line = d3Shape.line()
-        .x( (d: any) => this.x(d.x) )
-        .y( (d: any) => this.y(d.y) );
+    // this.line = d3.line()
+    //     .x( (d: any) => this.x(d.x) )
+    //     .y( (d: any) => this.y(d.y) );
+
+    this.line = d3.line()
+      .x((d: any) => this.x(d.x)
+      )
+      .y((d: any) => this.y(d.y)
+    );
 
     this.x.domain([
       d3Array.min(TEMPERATURES, function(c) { return d3Array.min(c.values, function(d) { return d.x - 10}); }),
@@ -89,10 +99,10 @@ private drawAxis(): void {
       .call(d3Axis.axisLeft(this.y))
       .append('text')
       .attr('transform', 'rotate(-90)')
-    //  .attr('y', 6)
-    //   .attr('dy', '0.71em')
-    //   .attr('fill', '#FFF')
-    //   .text('Temperature, ºF');
+      .attr('y', 6)
+      .attr('dy', '0.71em')
+      .attr('fill', '#FFF')
+      .text('Temperature, ºF');
 }
 
 private minMax(): any[] {
@@ -117,16 +127,60 @@ private minMax(): any[] {
 }
 
 private drawPath(): void {
-  // const symbols = d3Shape.symbol()
-  //                 .type(d => (d[1]>0 ? d3Shape.symbolCircle : d3Shape.symbolDiamond))
-  //                 .size((d, i) => (i % 2 ? 0 : 64));
-  //console.log("Symbol : ",symbols);
-  //this.minMax()
+
   let city = this.g.selectAll('.city')
       .data(TEMPERATURES)
       .enter().append('g')
       .attr('class', 'city')
       .attr('fill', 'none');
+
+    city.append('path')
+      .attr('class', 'line')
+      .attr('d', (d) => this.line(d.values))
+      .style('stroke', (d) => this.z(d.id));
+
+      city.selectAll("dot")
+        .data(TEMPERATURES)
+        .enter().append("circle")
+        .attr("r", 5)
+        .attr("cx", function(d) { return this.x(0); })
+        .attr("cy", function(d) { return this.y(0); });
+
+    city.append('text')
+      .datum(function(d) { return {id: d.id, value: d.values[d.values.length - 1]}; })
+      .attr('transform', (d) => 'translate(' + this.x(d.value.date) + ',' + this.y(d.value.y) + ')' )
+      .attr('x', 3)
+      .attr('dy', '0.35em')
+      .style('font', '10px sans-serif')
+      .text(function(d) { return d.id; });    
+      
+      
+  // const symbols = d3Shape.symbol()
+  //                 .type(d => (d[1]>0 ? d3Shape.symbolCircle : d3Shape.symbolDiamond))
+  //                 .size((d, i) => (i % 2 ? 0 : 64));
+  //console.log("Symbol : ",symbols);
+  //this.minMax()
+
+  // let city = this.g.append("circle")
+  //             .selectAll("dot")
+  //             .data(this.minMaxPointsArray.map((data) => {}))
+  //             .enter()
+              // .append("linearGradient")
+              // .attr("id", function (d) { return "gradX" + d.x})
+              // .attr("x1", "0%")
+              // .attr("x2", "0%")
+              // .attr("y1", "100%")
+              // .attr("y2", "0%")
+              // city.append("stop")
+              // .attr("offset", function (d) { return d.grad + "%" })
+              // .attr("stop-color", function (d) { return "red"; })
+              // city.append("stop")
+              // .attr("offset", function (d) { return (d.grad) + "%" })
+              // .attr("stop-color", "white");
+
+
+
+  
 
       //this.g.selectAll('dot')
 
@@ -146,10 +200,7 @@ private drawPath(): void {
   // .attr('cy', 560)
   // .style('stroke', '#000')
 
-  city.append('path')
-      .attr('class', 'line')
-      .attr('d', (d) => this.line(d.values))
-      .style('stroke', (d) => this.z(d.id));
+
 
 
       //.style('stroke', (d) => this.z(d.id));
@@ -179,14 +230,18 @@ private drawPath(): void {
   //     .attr("r", 5.5)
   //     .attr("cx", this.minMax().map((data) => { return }))
 
-  city.append('text')
-      .datum(function(d) { return {id: d.id, value: d.values[d.values.length - 1]}; })
-      .attr('transform', (d) => 'translate(' + this.x(d.value.date) + ',' + this.y(d.value.y) + ')' )
-      .attr('x', 3)
-      .attr('dy', '0.35em')
-      .style('font', '10px sans-serif')
-      .text(function(d) { return d.id; });
 
+
+}
+
+drawHighLow(): void{
+  this.g.selectAll('dot')
+      .enter()
+      .append('g')
+      .attr('r', 40)
+      .attr('cx', (d) => { console.log("Hello",d); return d.x})
+      .attr('cy', (d) => { return d.y})
+      .style('stroke', (d)=> this.z(d.id));
 }
 
 }
