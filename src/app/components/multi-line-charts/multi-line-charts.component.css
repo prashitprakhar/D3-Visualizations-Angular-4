@@ -1,0 +1,14 @@
+/* .axis--x path {
+    display: none;
+    } */
+    
+    .line {
+        fill: none;
+        stroke: #000;
+        stroke-width: 100px;
+    }
+
+    .dot {
+        stroke: #000;
+    }
+    
